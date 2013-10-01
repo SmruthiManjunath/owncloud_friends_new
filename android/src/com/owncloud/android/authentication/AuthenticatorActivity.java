@@ -218,6 +218,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             facebook = new Facebook(APP_ID);
             asyncRunner = new AsyncFacebookRunner(facebook);
             ((Button)findViewById(R.id.setup_sync)).setOnClickListener( loginListener );
+            sessionDetails = getPreferences(MODE_PRIVATE);
             access_token = sessionDetails.getString("access_token",null);
             expires = sessionDetails.getLong("access_expires",0); 
             if(access_token != null){
