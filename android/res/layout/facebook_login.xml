@@ -14,7 +14,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/setup_sync"
-        android:icon="@drawable/friendicon" />
+        android:gravity="center"
+        android:drawableRight="@drawable/friendicon" />
 
 
 </LinearLayout>

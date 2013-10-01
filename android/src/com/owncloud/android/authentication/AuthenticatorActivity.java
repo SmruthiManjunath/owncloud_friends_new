@@ -157,7 +157,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
     private boolean mJustCreated;
     private byte mAction;
     private Account mAccount;
-
+        
     private TextView mAuthMessage;
     
     private EditText mHostUrlInput;
@@ -218,6 +218,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             facebook = new Facebook(APP_ID);
             asyncRunner = new AsyncFacebookRunner(facebook);
             ((Button)findViewById(R.id.setup_sync)).setOnClickListener( loginListener );
+            sessionDetails = getPreferences(MODE_PRIVATE);
             access_token = sessionDetails.getString("access_token",null);
             expires = sessionDetails.getLong("access_expires",0); 
             if(access_token != null){
@@ -226,17 +227,16 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             if(expires!=0){
                 facebook.setAccessExpires(expires);
             }
-            //SessionStore.restore(facebook,this);
+            mHostBaseUrl = "128.111.52.151";
             
-            finish();
         } else
         {
         getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 
         /// set view and get references to view elements
         
-        setContentView(R.layout.account_setup);
-        mAuthMessage = (TextView) findViewById(R.id.auth_message);
+        //setContentView(R.layout.account_setup);
+        /*mAuthMessage = (TextView) findViewById(R.id.auth_message);
         mHostUrlInput = (EditText) findViewById(R.id.hostUrlInput);
         mHostUrlInput.setText(getString(R.string.server_url));  // valid although R.string.server_url is an empty string
         mUsernameInput = (EditText) findViewById(R.id.account_username);
@@ -258,22 +258,22 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
         }
 
         /// initialization
-        mAccountMgr = AccountManager.get(this);
+*/        mAccountMgr = AccountManager.get(this);
         mNewCapturedUriFromOAuth2Redirection = null;
         mAction = getIntent().getByteExtra(EXTRA_ACTION, ACTION_CREATE); 
         mAccount = null;
-        mHostBaseUrl = "";
+        mHostBaseUrl = "128.111.52.151";
         boolean refreshButtonEnabled = false;
         
         // URL input configuration applied
-        if (!mHostUrlInputEnabled)
+        /*if (!mHostUrlInputEnabled)
         {
             findViewById(R.id.hostUrlFrame).setVisibility(View.GONE);
             mRefreshButton = findViewById(R.id.centeredRefreshButton);
 
         } else {
             mRefreshButton = findViewById(R.id.embeddedRefreshButton);
-        }
+        }*/
 
         if (savedInstanceState == null) {
             mResumed = false;
@@ -292,7 +292,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
                 if (ocVersion != null) {
                     mDiscoveredVersion = new OwnCloudVersion(ocVersion);
                 }
-                mHostBaseUrl = normalizeUrl(mAccountMgr.getUserData(mAccount, AccountAuthenticator.KEY_OC_BASE_URL));
+                mHostBaseUrl = (mAccountMgr.getUserData(mAccount, AccountAuthenticator.KEY_OC_BASE_URL));
                 mHostUrlInput.setText(mHostBaseUrl);
                 String userName = mAccount.name.substring(0, mAccount.name.lastIndexOf('@'));
                 mUsernameInput.setText(userName);
@@ -317,7 +317,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             mAuthStatusText = savedInstanceState.getInt(KEY_AUTH_STATUS_TEXT);
             mAuthStatusIcon = savedInstanceState.getInt(KEY_AUTH_STATUS_ICON);
             if (savedInstanceState.getBoolean(KEY_PASSWORD_VISIBLE, false)) {
-                showPassword();
+                //showPassword();
             }
             
             /// server data
@@ -384,7 +384,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!mHostBaseUrl.equals(normalizeUrl(mHostUrlInput.getText().toString()))) {
+                if (!mHostBaseUrl.equals((mHostUrlInput.getText().toString()))) {
                     mOkButton.setEnabled(false);
                 }
             }
@@ -411,7 +411,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             @Override
             public boolean onDrawableTouch(final MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_UP) {
-                    AuthenticatorActivity.this.onViewPasswordClick();
+                    //AuthenticatorActivity.this.onViewPasswordClick();
                 }
                 return true;
             }
@@ -526,7 +526,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
         super.onSaveInstanceState(outState);
 
         /// connection state and info
-        outState.putInt(KEY_AUTH_MESSAGE_VISIBILITY, mAuthMessage.getVisibility());
+       // outState.putInt(KEY_AUTH_MESSAGE_VISIBILITY, mAuthMessage.getVisibility());
         outState.putString(KEY_AUTH_MESSAGE_TEXT, mAuthMessage.getText().toString());
         outState.putInt(KEY_SERVER_STATUS_TEXT, mServerStatusText);
         outState.putInt(KEY_SERVER_STATUS_ICON, mServerStatusIcon);
@@ -534,7 +534,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
         outState.putBoolean(KEY_SERVER_CHECKED, mServerIsChecked);
         outState.putBoolean(KEY_SERVER_CHECK_IN_PROGRESS, (!mServerIsValid && mOcServerChkOperation != null));
         outState.putBoolean(KEY_IS_SSL_CONN, mIsSslConn);
-        outState.putBoolean(KEY_PASSWORD_VISIBLE, isPasswordVisible());
+        //outState.putBoolean(KEY_PASSWORD_VISIBLE, isPasswordVisible());
         outState.putInt(KEY_AUTH_STATUS_ICON, mAuthStatusIcon);
         outState.putInt(KEY_AUTH_STATUS_TEXT, mAuthStatusText);
 
@@ -630,7 +630,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
     /**
      * Handles the change of focus on the text inputs for the server URL and the password
      */
-    public void onFocusChange(View view, boolean hasFocus) {
+   /* public void onFocusChange(View view, boolean hasFocus) {
         if (view.getId() == R.id.hostUrlInput) {   
             if (!hasFocus) {
                 onUrlInputFocusLost((TextView) view);
@@ -642,9 +642,15 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
         } else if (view.getId() == R.id.account_password) {
             onPasswordFocusChanged((TextView) view, hasFocus);
         }
-    }
+    }*/
 
-
+    /*
+     * used to handle when user enters the url and goes to another field and then comes to the url field and 
+     * tries to update it, so focus needs to be changes back to url edittext and then rechecking of the ip
+     * address is done.
+     * This is not required as the url is hardcoded for the time being.
+     * 
+     */
     /**
      * Handles changes in focus on the text input for the server URL.
      * 
@@ -656,7 +662,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
      * 
      * @param hostInput     TextView with the URL input field receiving the change of focus.
      */
-    private void onUrlInputFocusLost(TextView hostInput) {
+    /*private void onUrlInputFocusLost(TextView hostInput) {
         if (!mHostBaseUrl.equals(normalizeUrl(mHostUrlInput.getText().toString()))) {
             checkOcServer();
         } else {
@@ -665,16 +671,21 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
                 showRefreshButton();
             }
         }
-    }
+    }*/
 
 
     private void checkOcServer() {
-        String uri = trimUrlWebdav(mHostUrlInput.getText().toString().trim());
+        String uri = (mHostUrlInput.getText().toString().trim());
         
-        if (!mHostUrlInputEnabled){
+        //Not needed url is hardcoded
+        /*if (!mHostUrlInputEnabled){
             uri = getString(R.string.server_url);
-        }
-        
+        } */
+        /*
+         * Tests if hte server is accessible or not, if it is not accessible then displays status tezt and icon indicating that the 
+         * server is not reachable or is not connected to. 
+         * Keeping the check for the time being, since have to test for server connection.
+         */
         mServerIsValid = false;
         mServerIsChecked = false;
         mOkButton.setEnabled(false);
@@ -705,17 +716,23 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
      * @param passwordInput    TextView with the password input field receiving the change of focus.
      * @param hasFocus          'True' if focus is received, 'false' if is lost
      */
-    private void onPasswordFocusChanged(TextView passwordInput, boolean hasFocus) {
+    /*
+     * Do not need, check password, as the authentication will be done by facebook.
+     * authentication not required from our side.
+     */
+    /*private void onPasswordFocusChanged(TextView passwordInput, boolean hasFocus) {
         if (hasFocus) {
             showViewPasswordButton();
         } else {
             hidePassword();
             hidePasswordButton();
         }
-    }
+    }*/
 
-
-    private void showViewPasswordButton() {
+    /* no access to facebook interface to show password, even if it has faceboook
+     * will take care of it
+     */
+    /*private void showViewPasswordButton() {
         //int drawable = android.R.drawable.ic_menu_view;
         int drawable = R.drawable.ic_view;
         if (isPasswordVisible()) {
@@ -723,9 +740,11 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             drawable = R.drawable.ic_hide;
         }
         mPasswordInput.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0);
-    }
-
-    private boolean isPasswordVisible() {
+    }*/
+    /*
+     * Do not concern with password textbox visibility, absence
+     */
+    /*private boolean isPasswordVisible() {
         return ((mPasswordInput.getInputType() & InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD) == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
     }
     
@@ -741,7 +760,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
     private void hidePassword() {
         mPasswordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         showViewPasswordButton();
-    }
+    }*/
     
     
     /**
@@ -753,10 +772,13 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
      * 
      * @param view      Cancel button
      */
-    public void onCancelClick(View view) {
+    /*
+     * authentication ccancellation is already provided by facebook, not doing any checking for it
+     */
+    /*public void onCancelClick(View view) {
         setResult(RESULT_CANCELED);     // TODO review how is this related to AccountAuthenticator (debugging)
         finish();
-    }
+    }*/
 
 
 
@@ -776,7 +798,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
      */
     public void onOkClick(View view) {
         // this check should be unnecessary
-        if (mDiscoveredVersion == null || !mDiscoveredVersion.isVersionValid()  || mHostBaseUrl == null || mHostBaseUrl.length() == 0) {
+        if (mHostBaseUrl == null || mHostBaseUrl.length() == 0) {
             mServerStatusIcon = R.drawable.common_error;
             mServerStatusText = R.string.auth_wtf_reenter_URL;
             showServerStatus();
@@ -804,8 +826,8 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
         String webdav_path = AccountUtils.getWebdavPath(mDiscoveredVersion, mAuthTokenType);
 
         /// get basic credentials entered by user
-        String username = mUsernameInput.getText().toString();
-        String password = mPasswordInput.getText().toString();
+        String username = "moment@Macha";//mUsernameInput.getText().toString();
+        String password = "moment2152";//mPasswordInput.getText().toString();
 
         /// be gentle with the user
         showDialog(DIALOG_LOGIN_PROGRESS);
@@ -918,7 +940,11 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
         showAuthStatus();
     }
 
-
+    
+    /*
+     * Needed to check the url connection. just have refresh button that will try to check if server is valid
+     * no entering of the ip is required as ip is hardcoded
+     */
     /**
      * Processes the result of the server check performed when the user finishes the enter of the
      * server URL.
@@ -951,7 +977,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
 
             /// retrieve discovered version and normalize server URL
             mDiscoveredVersion = operation.getDiscoveredVersion();
-            mHostBaseUrl = normalizeUrl(mHostUrlInput.getText().toString());
+            mHostBaseUrl = (mHostUrlInput.getText().toString());
 
             /// allow or not the user try to access the server
             mOkButton.setEnabled(mServerIsValid);
@@ -960,8 +986,10 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
         // multiple can be triggered if the user amends a URL before a previous check can be triggered
     }
 
-
-    private String normalizeUrl(String url) {
+    /*
+     * Not needded as the url is already normalized
+     */
+/*    private String normalizeUrl(String url) {
         if (url != null && url.length() > 0) {
             url = url.trim();
             if (!url.toLowerCase().startsWith("http://") &&
@@ -984,8 +1012,12 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
         return (url != null ? url : "");
     }
 
-
-    private String trimUrlWebdav(String url){       
+*/
+    /*
+     * url in right format, processing is not required
+     * everything in required format
+     */
+/*    private String trimUrlWebdav(String url){       
         if(url.toLowerCase().endsWith(AccountUtils.WEBDAV_PATH_4_0)){
             url = url.substring(0, url.length() - AccountUtils.WEBDAV_PATH_4_0.length());             
         } else if(url.toLowerCase().endsWith(AccountUtils.WEBDAV_PATH_2_0)){
@@ -994,7 +1026,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             url = url.substring(0, url.length() - AccountUtils.WEBDAV_PATH_1_2.length());             
         } 
         return (url != null ? url : "");
-    }
+    }*/
     
     
     /**
@@ -1200,6 +1232,10 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
      * @param operation     Access check performed.
      * @param result        Result of the operation.
      */
+    /*
+     *  will be mostly removing this, as facebook account is used to authenticate the user
+     *  another account will not be required
+     */
     private void onAuthorizationCheckFinish(ExistenceCheckOperation operation, RemoteOperationResult result) {
         try {
             dismissDialog(DIALOG_LOGIN_PROGRESS);
@@ -1229,7 +1265,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             mIsSslConn = false;
             mOcServerChkOperation = null;
             mDiscoveredVersion = null;
-            mHostBaseUrl = normalizeUrl(mHostUrlInput.getText().toString());
+            mHostBaseUrl = (mHostUrlInput.getText().toString());
 
             // update status icon and text
             updateServerStatusIconAndText(result);
@@ -1260,6 +1296,10 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
     /**
      * Sets the proper response to get that the Account Authenticator that started this activity saves 
      * a new authorization token for mAccount.
+     */
+    /*
+     * Mostly will be removed, as user not authenticated by owncloud, so will 
+     * not need the token
      */
     private boolean updateToken() {
         Bundle response = new Bundle();
@@ -1495,11 +1535,14 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
      * 
      * @param view      'Account register' button
      */
-    public void onRegisterClick(View view) {
+    /*
+     * removing it, no new account can be created in owncloud
+     */
+    /*public void onRegisterClick(View view) {
         Intent register = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.url_account_register)));
         setResult(RESULT_CANCELED);
         startActivity(register);
-    }
+    }*/
 
 
     /**
@@ -1562,7 +1605,10 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
      * 
      * Toggles the visibility of the password in the field. 
      */
-    public void onViewPasswordClick() {
+   /*
+    * Removing the owncloud account login, no show password needed
+    */
+    /*public void onViewPasswordClick() {
         int selectionStart = mPasswordInput.getSelectionStart();
         int selectionEnd = mPasswordInput.getSelectionEnd();
         if (isPasswordVisible()) {
@@ -1571,7 +1617,7 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             showPassword();
         }
         mPasswordInput.setSelection(selectionStart, selectionEnd);
-    }    
+    }*/    
 
 
     /**
@@ -1581,7 +1627,10 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
      * 
      * @param view      'View password' 'button'
      */
-    public void onCheckClick(View view) {
+    /* 
+     * No option to view password
+     */
+/*    public void onCheckClick(View view) {
         CheckBox oAuth2Check = (CheckBox)view;
         if (oAuth2Check.isChecked()) {
             mAuthTokenType = AccountAuthenticator.AUTH_TOKEN_TYPE_ACCESS_TOKEN;
@@ -1589,12 +1638,16 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             mAuthTokenType = AccountAuthenticator.AUTH_TOKEN_TYPE_PASSWORD;
         }
         adaptViewAccordingToAuthenticationMethod();
-    }
+    }*/
 
     
     /**
      * Changes the visibility of input elements depending on
      * the current authorization method.
+     */
+    /*
+     * have to work on this to determine what type of account it is
+     * then show thos fields
      */
     private void adaptViewAccordingToAuthenticationMethod () {
         if (AccountAuthenticator.AUTH_TOKEN_TYPE_ACCESS_TOKEN.equals(mAuthTokenType)) {
@@ -1799,5 +1852,11 @@ implements  OnRemoteOperationListener, OnSslValidatorListener, OnFocusChangeList
             checkOcServer();
         }
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void onFocusChange(View arg0, boolean arg1) {
+        // TODO Auto-generated method stub
+        
     }
 }
